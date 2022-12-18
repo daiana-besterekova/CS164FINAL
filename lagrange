@@ -1,0 +1,87 @@
+def optimize_two_variable_function(f, g1, g2, x0, y0, l1, l2, alpha=0.1, tolerance=1e-6, max_iter=1000):
+
+    x, y, l1, l2 = x0, y0, l1, l2
+    objective_values = []
+    for i in range(max_iter):
+        
+        # Calculate the partial derivatives of the objective function
+        df_dx = l1 * g1(x, y) + l2 * max(0, g2(x, y)) + f(x, y)
+        df_dy = l1 * g1(x, y) + l2 * max(0, g2(x, y)) + f(x, y)
+        df_dl1 = g1(x, y) * x + g1(x, y) * y
+        df_dl2 = max(0, g2(x, y)) * x + max(0, g2(x, y)) * y
+        
+        # Update x, y, and the Lagrange multipliers using gradient descent
+        x -= alpha * df_dx
+        y -= alpha * df_dy
+        l1 -= alpha * df_dl1
+        l2 -= alpha * df_dl2
+        
+        # Calculate the value of the objective function
+        objective_value = l1 * (g1(x, y) * x + g1(x, y) * y) + l2 * max(0, g2(x, y)) * (x + y) + f(x, y)
+        objective_values.append(objective_value)
+        
+        # Check if the optimization should continue
+        if len(objective_values) > 1 and abs(objective_values[-1] - objective_values[-2]) < tolerance:
+            break
+    
+    return x, y, l1, l2
+
+import numpy as np
+
+# Define the objective function and the constraint functions
+def f(x, y):
+    # CHANGE YOUR FUNCTION HERE:
+    #ROSENBROCK: (x[-1)**2 + 100*(x-y**2)**2
+    #TEST2: sin(x)*cos(y)
+    #TEST3: -(x*sin(y)*(3 - x - x*sin(y)) + (x*cos(y)*x*sin(y))/2)
+    return sin(x)*cos(x)
+
+def g1(x, y):
+    return 0
+
+def g2(x, y):
+    return x^2 - 3
+
+# Initialize the variables and the Lagrange multipliers
+x0 = 1
+y0 = 1
+l10 = 1
+l20 = 1
+
+# Optimize the function
+x, y, l1, l2 = optimize_two_variable_function(f, g1, g2, x0, y0, l10, l20)
+
+# Print the optimal values
+print(x)
+print(y)
+
+
+# Find the solution
+import matplotlib.pyplot as plt
+
+
+# Find the solution
+x, y, l1, l2 = optimize_two_variable_function(f, g1, g2, x0, y0, l1, l2, alpha=0.1, tolerance=1e-6, max_iter=1000)
+
+
+# Plot the objective function and the constraints
+X, Y = np.meshgrid(np.linspace(-10, 10, 50), np.linspace(-10, 10, 50))
+Z = f(X, Y)
+plt.contour(X, Y, Z, colors='k')
+
+#Create a mask for the feasible region
+mask = np.logical_and(g1(X,Y), g2(X, Y) >= 0)
+
+# Color the feasible region
+plt.contourf(X, Y, mask, alpha=0.5)
+
+plt.plot(x, y, 'ro', markersize=10)
+
+
+# Add labels and show the plot
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+
+
